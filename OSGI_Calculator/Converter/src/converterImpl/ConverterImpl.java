@@ -220,7 +220,7 @@ public class ConverterImpl implements Converter {
 		special_tens.add("eleven");
 		special_tens.add("twelve");
 		special_tens.add("thirteen");
-		special_tens.add("forteen");
+		special_tens.add("fourteen");
 		special_tens.add("fifteen");
 		special_tens.add("sixteen");
 		special_tens.add("seventeen");
