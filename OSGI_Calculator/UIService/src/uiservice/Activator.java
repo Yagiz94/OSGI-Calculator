@@ -301,7 +301,7 @@ public class Activator implements BundleActivator {
 				int res;
 
 				// Special cases like zero addition are added in this section
-				if (jTextField1.getText().equals("sıfır") && jTextField2.getText().equals("sýfýr")) {
+				if (jTextField1.getText().equals("sıfır") && jTextField2.getText().equals("sıfır")) {
 					res = 0;
 					jTextField3.setText("sıfır");
 				} else if (jTextField1.getText().equals("sıfır")) {
