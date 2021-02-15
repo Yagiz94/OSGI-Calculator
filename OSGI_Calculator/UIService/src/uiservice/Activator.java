@@ -415,13 +415,6 @@ public class Activator implements BundleActivator {
 	}
 
 	public int divide(int a, int b) {
-
-		int result;
-		if (a < b) {
-			result = 0;
-		} else {
-			result = a / b;
-		}
-		return result;
+		return a / b;
 	}
 }

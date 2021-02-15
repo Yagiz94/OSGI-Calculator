@@ -2,13 +2,11 @@
  *  This class executes text-to-integer, integer-to-text conversion methods needed for the assignment.
  *  Each conversion method has Turkish and English versions. 
  *  These methods are implemented regarding the differences in both languages' word structures.
- *  numberToTextENG() and numberToTextTR() methods can translate any integer between 0 and 10 000 000.
- *  textToIntTR() and textToIntENG() methods can translate any input between 0 and 1 000 000.
+ *  numberToTextENG() and numberToTextTR() methods can translate any integer between -1 million and 1 million.
+ *  textToIntTR() and textToIntENG() methods can convert between -1 million and 1 million.
  *  WARNING! 
- *  The calculator is only functional for positive numbers. 
- *  Because numberToInt functions are only written for positive values.
- *  Actually the calculator computes negative values but the negative integer value is not converted to text in numberToInt()
-*/
+ *  
+ */
 
 package converterImpl;
 
@@ -22,7 +20,7 @@ public class ConverterImpl implements Converter {
 	// public static void main(String[] args) {
 
 	// Test
-	// System.out.println("Sonuc: " + textToInt("bin yÃ¼z yedi"));
+	// System.out.println("Sonuc: " + textToInt("bin yüz yedi"));
 	// int number = 7999919;
 	// System.out.println(numberToTextTR(number));
 	// System.out.println(numberToTextENG(number));
@@ -33,7 +31,7 @@ public class ConverterImpl implements Converter {
 	 * The method is written according to Turkish language syntax. This method
 	 * converts the entered text to an integer value in order to calculate simple
 	 * operations on UIService The text is splitted and every word is analyzed
-	 * accordingly. The basamak array stores special digits like a hunndred or a
+	 * accordingly. The basamak array stores special digits like a hundred or a
 	 * thousand. The algorithm is; on each word, if you see a basamak[] element,
 	 * multiply the number with the basamak. Else, update the number by adding the
 	 * corresponding int value.
@@ -186,6 +184,10 @@ public class ConverterImpl implements Converter {
 				// System.out.println(value1);
 			}
 		}
+
+		// If the text input is negative convert the computed integer value to negative
+		if (splittedString[0].equals("eksi"))
+			value1 = value1 * -1;
 
 		return value1;
 	}
@@ -383,17 +385,20 @@ public class ConverterImpl implements Converter {
 			}
 		}
 
+		// If the text input is negative make the computed integer negative
+		if (splittedString[0].equals("minus"))
+			value1 = value1 * -1;
+
 		return value1;
 	}
 
 	/*
-	 * The method converts any integer value between 0 and 10 million into Turkish
-	 * text. Algorithm: Each time, divide the number with the corresponding digit
-	 * and find the int value in that digit. After that decrement the number by (number * digit) 
-	 * Example: onBinler = 13000/10000 = 1. 
-	 * number -= (onBinler * 10000). 
-	 * binler = 30000/1000 = 3, etc.
-	 * In the method, there are many corner cases covered.
+	 * The method converts any integer value between -1 million and 1 million, into
+	 * Turkish text. Algorithm: Each time, divide the number with the corresponding
+	 * digit and find the int value in that digit. After that decrement the number
+	 * by (number * digit) Example: onBinler = 13000/10000 = 1. number -= (onBinler
+	 * * 10000). binler = 30000/1000 = 3, etc. In the method, there are many corner
+	 * cases covered.
 	 */
 	@Override
 	public String numberToTextTR(int number) {
@@ -406,16 +411,22 @@ public class ConverterImpl implements Converter {
 				"yedi yüz", "sekiz yüz", "dokuz yüz" };
 		String[] binlerBasamagi = new String[] { "bin", "iki bin", "üç bin", "dört bin", "beş bin", "altı bin",
 				"yedi bin", "sekiz bin", "dokuz bin" };
-		String[] milyonlarBasamagi = new String[] { "bir milyon", "iki milyon", "üç milyon", "dört milyon",
-				"beş milyon", "altı milyon", "yedi milyon", "sekiz milyon", "dokuz milyon" };
 
-		String birlerText, onlarText, yuzlerText, binlerText, onBinlerText, yuzBinlerText, milyonlarText;
-		int birler, onlar, yuzler, binler, onbinler, yuzbinler, milyonlar;
+		String birlerText, onlarText, yuzlerText, binlerText, onBinlerText, yuzBinlerText;
+		int birler, onlar, yuzler, binler, onbinler, yuzbinler;
 
 		StringJoiner outputText = new StringJoiner(" ");
 
 		birler = number % 10;
 		onlar = (number - birler) / 10;
+
+		// If the number is smaller than zero, add minus to the first position in the
+		// output Text
+		// and set number = number * -1 to calculate the correct value
+		if (number < 0) {
+			number = number * -1;
+			outputText.add("eksi");
+		}
 
 		if (number > 0 && number < 10) {
 			birler = number % 10;
@@ -590,85 +601,16 @@ public class ConverterImpl implements Converter {
 			outputText.add(onlarText);
 			outputText.add(birlerText);
 		}
-
-		else if (1000000 <= number && number < 10000000) {
-			milyonlar = number / 1000000;
-			number = number - (milyonlar * 1000000);
-			yuzbinler = number / 100000;
-			number = number - (yuzbinler * 100000);
-			onbinler = number / 10000;
-			number = number - (onbinler * 10000);
-			binler = number / 1000;
-			number = number - (binler * 1000);
-			yuzler = number / 100;
-			number = number - (yuzler * 100);
-			onlar = number / 10;
-			birler = number % 10;
-
-			if (birler == 0) {
-				birlerText = "";
-			} else {
-				birlerText = birlerBasamagi[birler - 1];
-			}
-			if (onlar == 0) {
-				onlarText = "";
-			} else {
-				onlarText = ozelBasamak[onlar - 1];
-			}
-			if (yuzler == 0) {
-				yuzlerText = "";
-			} else {
-				yuzlerText = yuzlerBasamagi[yuzler - 1];
-			}
-			if (binler == 0) {
-				binlerText = "";
-			} else if (binler == 1) {
-				binlerText = "bin";
-			} else {
-				binlerText = binlerBasamagi[binler - 1];
-			}
-			if (onbinler == 0) {
-				onBinlerText = "";
-			} else {
-				onBinlerText = ozelBasamak[onbinler - 1];
-			}
-			if (onbinler == 0 && binler == 0) {
-				onBinlerText = "";
-				binlerText = "bin";
-				if (yuzbinler == 0) {
-					yuzBinlerText = "";
-					binlerText = "";
-				}
-			} else if (onbinler != 0 && binler == 0) {
-				onBinlerText = ozelBasamak[onbinler - 1];
-				binlerText = "bin";
-			}
-			if (yuzbinler == 0) {
-				yuzBinlerText = "";
-			} else {
-				yuzBinlerText = yuzlerBasamagi[yuzbinler - 1];
-			}
-			milyonlarText = milyonlarBasamagi[milyonlar - 1];
-
-			outputText.add(milyonlarText);
-			outputText.add(yuzBinlerText);
-			outputText.add(onBinlerText);
-			outputText.add(binlerText);
-			outputText.add(yuzlerText);
-			outputText.add(onlarText);
-			outputText.add(birlerText);
-		}
 		return outputText.toString();
 	}
-	
+
 	/*
-	 * The method converts any integer value between 0 and 10 million into English
-	 * text. Algorithm: Each time, divide the number with the corresponding digit
-	 * and find the int value in that digit. After that decrement the number by (number * digit) 
-	 * Example: onBinler = 13000/10000 = 1. 
-	 * number -= (onBinler * 10000). 
-	 * binler = 30000/1000 = 3, etc.
-	 * In the method, there are many corner cases covered.
+	 * The method converts any integer value between -1 million and 1 million, into
+	 * English text. Algorithm: Each time, divide the number with the corresponding
+	 * digit and find the int value in that digit. After that decrement the number
+	 * by (number * digit) Example: onBinler = 13000/10000 = 1. number -= (onBinler
+	 * * 10000). binler = 30000/1000 = 3, etc. In the method, there are many corner
+	 * cases covered.
 	 */
 	@Override
 	public String numberToTextENG(int number) {
@@ -683,16 +625,22 @@ public class ConverterImpl implements Converter {
 				"five hundred", "six hundred", "seven hundred", "eight hundred", "nine hundred" };
 		String[] binlerBasamagi = new String[] { "one thousand", "two thousand", "three thousand", "four thousand",
 				"five thousand", "six thousand", "seven thousand", "eight thousand", "nine thousand" };
-		String[] milyonlarBasamagi = new String[] { "one million", "two million", "three million", "four million",
-				"five million", "six million", "seven million", "eight million", "nine million" };
 
-		String birlerText, onlarText, yuzlerText, binlerText, onBinlerText, yuzBinlerText, milyonlarText;
-		int birler, onlar, yuzler, binler, onbinler, yuzbinler, milyonlar;
+		String birlerText, onlarText, yuzlerText, binlerText, onBinlerText, yuzBinlerText;
+		int birler, onlar, yuzler, binler, onbinler, yuzbinler;
 
 		StringJoiner outputText = new StringJoiner(" ");
 
 		birler = number % 10;
 		onlar = (number - birler) / 10;
+
+		// If the number is smaller than zero, add minus to the first position in the
+		// output Text
+		// and number = number * -1 to calculate the correct value
+		if (number < 0) {
+			number = number * -1;
+			outputText.add("minus");
+		}
 
 		if (number > 0 && number < 10) {
 			birler = number % 10;
@@ -809,7 +757,6 @@ public class ConverterImpl implements Converter {
 			} else {
 				onlarText = ozelBasamak[onlar - 1];
 			}
-
 			if (yuzler == 0) {
 				yuzlerText = "";
 			} else {
@@ -822,7 +769,12 @@ public class ConverterImpl implements Converter {
 			} else {
 				binlerText = binlerBasamagi[binler - 1];
 			}
-			onBinlerText = ozelBasamak[onbinler - 1];
+			if (onbinler == 1 && binler != 0) {
+				onBinlerText = onlarBasamagi[binler - 1];
+				binlerText = "thousand";
+			} else {
+				onBinlerText = ozelBasamak[onbinler - 1];
+			}
 
 			outputText.add(onBinlerText);
 			outputText.add(binlerText);
@@ -871,6 +823,9 @@ public class ConverterImpl implements Converter {
 			}
 			if (onbinler == 0) {
 				onBinlerText = "";
+			} else if (onbinler == 1 && binler != 0) {
+				onBinlerText = onlarBasamagi[binler - 1];
+				binlerText = "thousand";
 			} else {
 				onBinlerText = ozelBasamak[onbinler - 1];
 			}
@@ -895,77 +850,6 @@ public class ConverterImpl implements Converter {
 			outputText.add(birlerText);
 		}
 
-		else if (1000000 <= number && number < 10000000) {
-			milyonlar = number / 1000000;
-			number = number - (milyonlar * 1000000);
-			yuzbinler = number / 100000;
-			number = number - (yuzbinler * 100000);
-			onbinler = number / 10000;
-			number = number - (onbinler * 10000);
-			binler = number / 1000;
-			number = number - (binler * 1000);
-			yuzler = number / 100;
-			number = number - (yuzler * 100);
-			onlar = number / 10;
-			birler = number % 10;
-
-			if (birler == 0) {
-				birlerText = "";
-			} else {
-				birlerText = birlerBasamagi[birler - 1];
-			}
-			if (onlar == 0) {
-				onlarText = "";
-			} else if (onlar == 1 && birler != 0) {
-				birlerText = "";
-				onlarText = onlarBasamagi[birler - 1];
-			} else {
-				onlarText = ozelBasamak[onlar - 1];
-			}
-
-			if (yuzler == 0) {
-				yuzlerText = "";
-			} else {
-				yuzlerText = yuzlerBasamagi[yuzler - 1];
-			}
-			if (binler == 0) {
-				binlerText = "";
-			} else if (binler == 1) {
-				binlerText = "one thousand";
-			} else {
-				binlerText = binlerBasamagi[binler - 1];
-			}
-			if (onbinler == 0) {
-				onBinlerText = "";
-			} else {
-				onBinlerText = ozelBasamak[onbinler - 1];
-			}
-			if (onbinler == 0 && binler == 0) {
-				onBinlerText = "";
-				binlerText = "thousand";
-				if (yuzbinler == 0) {
-					yuzBinlerText = "";
-					binlerText = "";
-				}
-			} else if (onbinler != 0 && binler == 0) {
-				onBinlerText = ozelBasamak[onbinler - 1];
-				binlerText = "thousand";
-			}
-			if (yuzbinler == 0) {
-				yuzBinlerText = "";
-			} else {
-				yuzBinlerText = yuzlerBasamagi[yuzbinler - 1];
-			}
-			milyonlarText = milyonlarBasamagi[milyonlar - 1];
-
-			outputText.add(milyonlarText);
-			outputText.add(yuzBinlerText);
-			outputText.add(onBinlerText);
-			outputText.add(binlerText);
-			outputText.add(yuzlerText);
-			outputText.add(onlarText);
-			outputText.add(birlerText);
-		}
 		return outputText.toString();
 	}
 }
